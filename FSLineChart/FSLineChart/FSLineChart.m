@@ -27,6 +27,7 @@
 
 @property (nonatomic, strong) NSMutableArray* data;
 @property (nonatomic, strong) NSMutableArray* layers;
+@property (nonatomic, strong) NSMutableSet *labels;
 
 @property (nonatomic) CGFloat min;
 @property (nonatomic) CGFloat max;
@@ -64,6 +65,7 @@
 {
     _layers = [NSMutableArray array];
     self.backgroundColor = [UIColor whiteColor];
+    self.labels = [[NSMutableSet alloc] init];
     [self setDefaultParameters];
 }
 
@@ -77,8 +79,8 @@
     
     [self computeBounds];
     
-    CGFloat minBound = MIN(_min, 0);
-    CGFloat maxBound = MAX(_max, 0);
+    CGFloat minBound = _min;
+    CGFloat maxBound = _max;
     
     // No data
     if(isnan(_max)) {
@@ -125,6 +127,7 @@
             label.backgroundColor = _valueLabelBackgroundColor;
             
             [self addSubview:label];
+            [self.labels addObject:label];
         }
     }
     
@@ -164,6 +167,7 @@
             label.backgroundColor = _indexLabelBackgroundColor;
             
             [self addSubview:label];
+            [self.labels addObject:label];
         }
     }
     
@@ -244,12 +248,13 @@
         [layer removeFromSuperlayer];
     }
     [self.layers removeAllObjects];
+    [self.labels makeObjectsPerformSelector:@selector(removeFromSuperview)];
 }
 
 - (void)strokeChart
 {
-    CGFloat minBound = MIN(_min, 0);
-    CGFloat maxBound = MAX(_max, 0);
+    CGFloat minBound = _min;
+    CGFloat maxBound = _max;
     
     CGFloat scale = _axisHeight / (maxBound - minBound);
     
@@ -370,6 +375,9 @@
     _valueLabelTextColor = [UIColor grayColor];
     _valueLabelFont = [UIFont fontWithName:@"HelveticaNeue-Light" size:11];
     _valueLabelPosition = ValueLabelRight;
+    
+    _yMin = 0.0;
+    _yMax = 0.0;
 }
 
 - (void)computeBounds
@@ -388,6 +396,12 @@
     
     // The idea is to adjust the minimun and the maximum value to display the whole chart in the view, and if possible with nice "round" steps.
     _max = [self getUpperRoundNumber:_max forGridStep:_verticalGridStep];
+    
+    if (_yMax != 0.0) {
+        _max = _yMax;
+    }
+    
+    _min = _yMin;
     
     if(_min < 0) {
         // If the minimum is negative then we want to have one of the step to be zero so that the chart is displayed nicely and more comprehensively

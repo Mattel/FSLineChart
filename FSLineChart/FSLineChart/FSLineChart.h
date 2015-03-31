@@ -59,6 +59,10 @@ typedef NS_ENUM(NSInteger, ValueLabelPositionType) {
 @property (nonatomic) CGFloat axisWidth;
 @property (nonatomic) CGFloat axisHeight;
 
+// Y-axis scale
+@property (nonatomic) CGFloat yMin;
+@property (nonatomic) CGFloat yMax;
+
 // Decoration parameters, let you pick the color of the line as well as the color of the axis
 @property (nonatomic, strong) UIColor* axisColor;
 @property (nonatomic) CGFloat axisLineWidth;
