@@ -376,8 +376,8 @@
     _valueLabelFont = [UIFont fontWithName:@"HelveticaNeue-Light" size:11];
     _valueLabelPosition = ValueLabelRight;
     
-    _yMin = 0.0;
-    _yMax = 0.0;
+    _yMin = NSNotFound;
+    _yMax = NSNotFound;
 }
 
 - (void)computeBounds
@@ -395,13 +395,17 @@
     }
     
     // The idea is to adjust the minimun and the maximum value to display the whole chart in the view, and if possible with nice "round" steps.
-    _max = [self getUpperRoundNumber:_max forGridStep:_verticalGridStep];
+//    _max = [self getUpperRoundNumber:_max forGridStep:_verticalGridStep];
+    CGFloat delta = _max - _min;
+    _max = roundUpValueWithDelta(_max, delta);
+    _min = roundDownValueWithDelta(_min, delta);
     
-    if (_yMax != 0.0) {
+    if (_yMax != NSNotFound) {
         _max = _yMax;
     }
-    
-    _min = _yMin;
+    if (_yMin != NSNotFound) {
+        _min = _yMin;
+    }
     
     if(_min < 0) {
         // If the minimum is negative then we want to have one of the step to be zero so that the chart is displayed nicely and more comprehensively
@@ -450,6 +454,29 @@
         }
         
     }
+}
+
+CGFloat roundUpValueWithDelta(CGFloat value, CGFloat delta) {
+    CGFloat roundnessFactor = roundnessFactorForDelta(delta);
+    return ceil(value / roundnessFactor) * roundnessFactor;
+}
+
+CGFloat roundDownValueWithDelta(CGFloat value, CGFloat delta) {
+    CGFloat roundnessFactor = roundnessFactorForDelta(delta);
+    return floor(value / roundnessFactor) * roundnessFactor;
+}
+
+CGFloat roundnessFactorForDelta(CGFloat delta) {
+    
+    CGFloat localDelta = delta;
+    CGFloat roundness = 1.0;
+    
+    while (localDelta >= 10.0) {
+        localDelta /= 10.0;
+        roundness *= 10.0;
+    }
+    
+    return roundness;
 }
 
 - (CGFloat)getUpperRoundNumber:(CGFloat)value forGridStep:(int)gridStep

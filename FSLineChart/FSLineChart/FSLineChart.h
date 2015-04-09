@@ -96,4 +96,8 @@ typedef NS_ENUM(NSInteger, ValueLabelPositionType) {
 // Clear all rendered data from the view.
 - (void)clearChartData;
 
+// Rounding functions
+CGFloat roundUpValueWithDelta(CGFloat value, CGFloat delta);
+CGFloat roundDownValueWithDelta(CGFloat value, CGFloat delta);
+
 @end
