@@ -244,6 +244,9 @@
 
 - (void)clearChartData
 {
+    _min = MAXFLOAT;
+    _max = -MAXFLOAT;
+    
     for (CAShapeLayer *layer in self.layers) {
         [layer removeFromSuperlayer];
     }
@@ -318,8 +321,8 @@
 
 - (void)strokeDataPoints
 {
-    CGFloat minBound = MIN(_min, 0);
-    CGFloat maxBound = MAX(_max, 0);
+    CGFloat minBound = _min;
+    CGFloat maxBound = _max;
     
     CGFloat scale = _axisHeight / (maxBound - minBound);
     
@@ -378,15 +381,19 @@
     
     _yMin = NSNotFound;
     _yMax = NSNotFound;
+    
+    _min = MAXFLOAT;
+    _max = -MAXFLOAT;
 }
 
 - (void)computeBounds
 {
-    _min = MAXFLOAT;
-    _max = -MAXFLOAT;
-    
     for(int i=0;i<_data.count;i++) {
         NSNumber* number = _data[i];
+        
+        if ([number doubleValue] == NSNotFound)
+            continue;
+        
         if([number floatValue] < _min)
             _min = [number floatValue];
         
